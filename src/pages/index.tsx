@@ -5,7 +5,10 @@ export default function Home() {
   return (
     <>
       <main className={`font-['Times_New_Roman']`}>
-        Whoa! You&apos;re on the lo-fi version of https://www.kalkafox.dev/
+        Whoa! You&apos;re on the lo-fi version of https://kalkafox.dev/
+        <br />
+        The <code>www</code> subdomain wasn&apos;t in use, so I decided to make
+        this.
         <br />
         <Image
           src='https://avatars.githubusercontent.com/u/9144208'
