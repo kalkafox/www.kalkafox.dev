@@ -10,7 +10,8 @@ import Image from 'next/image'
 
 const pingServer = async () => {
   const then = Date.now()
-  await fetch('/api/yip')
+  //await fetch('/api/yip')
+  await fetch(`https://${process.env.VERCEL_URL}/api/yip`)
   return `time elapsed: ${Date.now() - then}ms`
 }
 
