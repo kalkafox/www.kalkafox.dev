@@ -1,4 +1,9 @@
-import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query'
+import {
+  DehydratedState,
+  QueryClient,
+  dehydrate,
+  useQuery,
+} from '@tanstack/react-query'
 import { useState } from 'react'
 
 import Image from 'next/image'
@@ -9,19 +14,15 @@ const pingServer = async () => {
   return `time elapsed: ${Date.now() - then}ms`
 }
 
-export async function getStaticProps() {
-  const queryClient = new QueryClient()
-
-  await queryClient.prefetchQuery(['yip'], pingServer)
-
+export async function getServerSideProps() {
   return {
     props: {
-      dehydratedState: dehydrate(queryClient),
+      ping: await pingServer(),
     },
   }
 }
 
-function Yip() {
+function Yip(props: { ping: string }) {
   const foxQuery = useQuery({
     queryKey: ['fox'],
     queryFn: async () => {
@@ -41,19 +42,12 @@ function Yip() {
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
+    initialData: props.ping,
   })
 
   return (
     <main className={`font-['Times_New_Roman']`}>
-      {yipQuery.isLoading ? (
-        'Loading...'
-      ) : yipQuery.error ? (
-        'An error has occurred: ' + yipQuery.error
-      ) : (
-        <>
-          <div>{yipQuery.data}</div>
-        </>
-      )}
+      <p>{yipQuery.data}</p>
       <br />
       <br />
       <br />
