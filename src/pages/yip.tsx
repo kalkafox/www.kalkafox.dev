@@ -1,11 +1,27 @@
-import { useQuery } from '@tanstack/react-query'
+import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
 import Image from 'next/image'
 
-function Yip() {
-  const [elapsed, setElapsed] = useState(0)
+const pingServer = async () => {
+  const then = Date.now()
+  await fetch('/api/yip')
+  return `time elapsed: ${Date.now() - then}ms`
+}
 
+export async function getStaticProps() {
+  const queryClient = new QueryClient()
+
+  await queryClient.prefetchQuery(['yip'], pingServer)
+
+  return {
+    props: {
+      dehydratedState: dehydrate(queryClient),
+    },
+  }
+}
+
+function Yip() {
   const foxQuery = useQuery({
     queryKey: ['fox'],
     queryFn: async () => {
@@ -21,14 +37,7 @@ function Yip() {
 
   const yipQuery = useQuery({
     queryKey: ['yip'],
-    queryFn: async () => {
-      const then = Date.now()
-      setElapsed(then)
-      const res = await fetch('/api/yip')
-      const data = await res.json()
-      setElapsed(Date.now() - then)
-      return data
-    },
+    queryFn: pingServer,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -42,8 +51,7 @@ function Yip() {
         'An error has occurred: ' + yipQuery.error
       ) : (
         <>
-          <div>{yipQuery.data.message}</div>
-          <div>{elapsed}ms</div>
+          <div>{yipQuery.data}</div>
         </>
       )}
       <br />
